@@ -1,0 +1,16 @@
+{
+  "name": "odyssey",
+  "version": "1.0.0",
+  "description": "Odyssey is an innovative, all-in-one AI companion application designed to seamlessly integrate into your daily life, offering personalized assistance and enhanced productivity. Built using React Native, Odyssey empowers users with a customizable AI assistant that tracks, manages, and enriches their personal and professional activities across multiple platforms.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:mobile": "cd mobile/OdysseyMobile && npx react-native run-ios",
+    "start:mobile:android": "cd mobile/OdysseyMobile && npx react-native run-android",
+    "start:desktop": "cd desktop && electron .",
+    "start:backend": "cd backend && node index.js"
+  },
+  "keywords": [],
+  "author": "V and Ani",
+  "license": "ISC"
+}
