@@ -1,0 +1,8 @@
+# Ignore node_modules directories
+node_modules/
+# Ignore build outputs
+*.log
+*.lock
+/mobile/Mobile/android/
+/mobile/Mobile/ios/
+/desktop/dist/
