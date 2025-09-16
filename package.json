@@ -12,5 +12,8 @@
   },
   "keywords": [],
   "author": "V and Ani",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^5.6.4"
+  }
 }

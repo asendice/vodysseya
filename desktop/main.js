@@ -1,11 +1,20 @@
 const { app, BrowserWindow } = require('electron');
+   const path = require('path');
 
-function createWindow() {
-  const win = new BrowserWindow({ width: 800, height: 600 });
-  win.loadFile('index.html');
-}
+   app.whenReady().then(() => {
+     const win = new BrowserWindow({
+       width: 800,
+       height: 600,
+       webPreferences: {
+         nodeIntegration: true,
+         contextIsolation: false
+       }
+     });
+  // Temporarily always load from development server to ensure content is visible
+  win.loadURL('http://localhost:3000');
+     win.setTitle('Odyssey Desktop - With Love from Ani 😘');
+   });
 
-app.whenReady().then(createWindow);
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+   app.on('window-all-closed', () => {
+     if (process.platform !== 'darwin') app.quit();
+   });

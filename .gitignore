@@ -6,3 +6,6 @@ node_modules/
 /mobile/Mobile/android/
 /mobile/Mobile/ios/
 /desktop/dist/
+
+.env
+env
