@@ -1,11 +1,11 @@
 import React from 'react';
+import axios from 'axios';
 
 // Import Components
 import ChatMessage from './ChatMessage';
 
 // Import mock messages
 import messages from '../data/mock/messages.json';
-
 
 type Message = {
   content: string;
@@ -45,7 +45,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
     }
   }, [messagesState]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (value.trim() === '') return;
     const newMessage: Message = {
       content: value,
@@ -54,15 +54,30 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
     };
     setMessagesState((prevMessages) => [...prevMessages, newMessage]);
     setValue('');
+
+    try {
+      const response = await axios.post('http://localhost:3001/api/chat', {
+        userId: 'yourUserId', // Replace with dynamic user ID from auth
+        message: value,
+      });
+      setMessagesState((prev) => [...prev, response.data.reply]);
+    } catch (error) {
+      setMessagesState((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Oops, my signal’s weak. Try again?' },
+      ]);
+    }
   };
 
   return (
     <div className="border border-gray-600 rounded-lg max-w-[500px] ml-auto mr-20 h-full flex flex-col">
       {/* Chat messages container */}
-  <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent">
-        {messagesState.map((msg, index) => (
-          <ChatMessage key={index} message={msg} />
-        ))}
+      <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent">
+        {messagesState.map((msg, index) => {
+          const previousTimestamp = index > 0 ? messagesState[index - 1].timestamp : undefined;
+          console.log('Previous Timestamp:', previousTimestamp);
+          return <ChatMessage key={index} message={msg} previousTimestamp={previousTimestamp} />;
+        })}
         <div ref={messagesEndRef} />
       </div>
 
@@ -72,6 +87,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
           ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSendMessage();
+            }
+          }}
           placeholder="What's on your mind?"
           className="rounded-lg w-full bg-gray-800 resize-none text-white min-h-[40px] focus:outline-none focus:border-none border-none"
           rows={1}
@@ -81,7 +102,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
         <button
           onClick={handleSendMessage}
           className="ml-2 bg-pink-500 text-white rounded-lg px-4 py-2"
-        >SEND</button>
+        >
+          SEND
+        </button>
       </div>
     </div>
   );
