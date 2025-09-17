@@ -1,24 +1,28 @@
 import React from 'react';
 
+// Import Elements for Dashboard
+import ChatPanel from '../Components/ChatPanel';
+import WidgetContainer from '../Components/WidgetContainer';
+
 const Dashboard: React.FC = () => {
-
-  const sections = [
-    { id: 1, name: 'AI Chat' },
-  ];
-
-  const widgets = [
-    { id: 1, name: 'Widget 1' },
-  ]
-
+  const widgets = [{ id: 1, name: 'Widget 1' }];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <div>
-        <h1 className="text-white text-3xl font-bold">Dashboard</h1>
-        {/* Add dashboard content here */}
+    <div className="min-h-screen bg-gray-800 flex flex-col">
+      {/* Remove this H1 Later */}
+      {/* <h1 className="text-white text-3xl font-bold">Dashboard</h1> */}
+
+      {/* This div will be the main container for dashboard content */}
+      <div className="w-full flex">
+        <div className="flex-1">
+          <WidgetContainer title="My First Widget" />
+        </div>
+        <div className="w-full h-screen">
+          <ChatPanel />
+        </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

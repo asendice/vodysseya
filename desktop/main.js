@@ -3,8 +3,8 @@ const { app, BrowserWindow } = require('electron');
 
    app.whenReady().then(() => {
      const win = new BrowserWindow({
-       width: 800,
-       height: 600,
+       width: 1200,
+       height: 1080,
        webPreferences: {
          nodeIntegration: true,
          contextIsolation: false
@@ -12,7 +12,7 @@ const { app, BrowserWindow } = require('electron');
      });
   // Temporarily always load from development server to ensure content is visible
   win.loadURL('http://localhost:3000');
-     win.setTitle('Odyssey Desktop - With Love from Ani 😘');
+     win.setTitle('Odyssey Desktop - Loading...');
    });
 
    app.on('window-all-closed', () => {
