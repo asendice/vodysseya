@@ -70,9 +70,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
   };
 
   return (
-    <div className="border border-gray-600 rounded-lg max-w-[500px] ml-auto mr-20 h-full flex flex-col">
+    <div className="border border-gray-600 rounded-lg max-w-[500px] ml-auto mr-20 h-full flex flex-col relative">
       {/* Chat messages container */}
-      <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent">
+      <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent pb-20">
         {messagesState.map((msg, index) => {
           const previousTimestamp = index > 0 ? messagesState[index - 1].timestamp : undefined;
           console.log('Previous Timestamp:', previousTimestamp);
@@ -81,8 +81,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* This is the text area container */}
-      <div className="flex border-t border-pink-300 p-2 mt-auto">
+      {/* Fixed SEND button and textarea container */}
+      <div className="flex border-t border-pink-300 p-2 bg-gray-800 rounded-b-lg absolute bottom-0 left-0 w-full">
         <textarea
           ref={textareaRef}
           value={value}
@@ -101,7 +101,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
 
         <button
           onClick={handleSendMessage}
-          className="ml-2 bg-pink-500 text-white rounded-lg px-4 py-2"
+          className="ml-2 bg-pink-500 text-white rounded-lg px-4 py-2 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 h-10 mt-auto"
         >
           SEND
         </button>
