@@ -1,8 +1,8 @@
 import React from 'react';
 
 // Import Elements for Dashboard
-import ChatPanel from '../Components/ChatPanel';
-import WidgetContainer from '../Components/WidgetContainer';
+import ChatPanel from '../components/ChatPanel';
+import WidgetContainer from '../components/WidgetContainer';
 
 const Dashboard: React.FC = () => {
   const widgets = [{ id: 1, name: 'Widget 1' }];
