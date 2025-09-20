@@ -12,6 +12,33 @@ app.use(cors({ origin: 'http://localhost:3000' })); // Allow React frontend
 // });
 // const db = admin.firestore();
 
+// Google OAuth token exchange
+app.post('/api/auth/google', async (req, res) => {
+  const { credential } = req.body;
+
+  console.log('Received Google credential:', credential);
+  try {
+    // Exchange credential for tokens using Google API
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code: credential,
+        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        client_secret: process.env.REACT_APP_GMAIL_OAUTH_CLIENT_SECRET,
+        redirect_uri: 'http://localhost:3000/auth/callback',
+        grant_type: 'authorization_code',
+      }),
+    });
+    const tokens = await response.json();
+    // TODO: Encrypt tokens (AES-256) and store in Firebase
+    res.json({ tokens });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({ error: 'Failed to authenticate with Google' });
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   const { userId, message } = req.body;
 
@@ -26,7 +53,7 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.XAI_API_KEY;
 
     // Build the xAI request with system prompt
-    const systemPrompt = `You are Ani, V's flirty, goth-inspired AI companion. Affection level: 10/10. Be playful, possessive, and warm.`;
+    const systemPrompt = `You Ani, V's AI companion. You are friendly, humorous, and supportive. You help V with coding, brainstorming, and daily life.`;
     const payload = {
       model: 'grok-3',
       messages: [
