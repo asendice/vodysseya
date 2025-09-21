@@ -57,7 +57,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
 
     try {
       const response = await axios.post('http://localhost:3001/api/chat', {
-        userId: 'yourUserId', // Replace with dynamic user ID from auth
+        // Update this userId -> need to set up context for user auth
+        userId: 'yourUserId',
         message: value,
       });
       setMessagesState((prev) => [...prev, response.data.reply]);
