@@ -14,8 +14,8 @@ const Dashboard: React.FC = () => {
 
       {/* This div will be the main container for dashboard content */}
       <div className="w-full flex">
-        <div className="flex-1">
-          <WidgetContainer title="My First Widget" />
+        <div className="w-full p-6">
+          <WidgetContainer title="Email" widgetType="email" />
         </div>
         <div className="w-full h-screen">
           <ChatPanel />

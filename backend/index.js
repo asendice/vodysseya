@@ -21,9 +21,11 @@ admin.initializeApp({
 // Import route files
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
+const emailRoutes = require('./routes/email');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/email', emailRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
