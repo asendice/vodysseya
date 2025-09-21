@@ -44,7 +44,7 @@ const Onboarding: React.FC = () => {
     // Step 0: Welcome
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-deep-blue to-gray-dark p-8 rounded-lg">
       <h1 className="text-4xl font-bold text-white mb-6">
-        Hey, I'm "companionName". Ready to make everyday feel special?
+        Hey, I'm "companionName". Ready to get started?
       </h1>
       <button
         className="bg-lavender text-white px-6 py-3 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-lavender"

@@ -59,18 +59,10 @@ const WidgetContainer: React.FC<WidgetContainerProps> = ({
                   className="bg-gray-900 p-3 rounded-md border border-gray-700 transition duration-300 hover:border-gray-400 hover:scale-105 animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <p className="text-white text-sm font-medium">Email ID: {email.id}</p>
-                  <p className="text-gray-400 text-xs">Thread: {email.threadId}</p>
+                  <p className="text-white text-sm font-medium">From: {email.from}</p>
+                  <p className="text-gray-400 text-xs">Subject: {email.subject}</p>
                   {/* TODO: Expand with sender, subject, snippet from detailed fetch */}
-                  <div className="flex gap-2 mt-2">
-                    <button className="text-gray-300 text-xs hover:text-gray-100">
-                      Read Aloud 🔊
-                    </button>
-                    <button className="text-gray-300 text-xs hover:text-gray-100">Reply ✏️</button>
-                    <button className="text-gray-300 text-xs hover:text-gray-100">
-                      Archive 🗑️
-                    </button>
-                  </div>
+                  <p className="text-gray-500 text-xs mt-1">{email.snippet}</p>
                 </div>
               ))}
             </div>
