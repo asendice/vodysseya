@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { auth } from '../firebase';
 
 // Import Components
 import ChatMessage from './ChatMessage';
@@ -30,6 +31,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
+  const user = auth.currentUser;
+
   // Auto-resize textarea
   React.useEffect(() => {
     if (textareaRef.current) {
@@ -58,7 +61,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
     try {
       const response = await axios.post('http://localhost:3001/api/chat', {
         // Update this userId -> need to set up context for user auth
-        userId: 'yourUserId',
+        userId: user?.uid,
         message: value,
       });
       setMessagesState((prev) => [...prev, response.data.reply]);
@@ -71,7 +74,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
   };
 
   return (
-    <div className="border border-gray-600 rounded-lg max-w-[500px] ml-auto mr-20 h-full flex flex-col relative">
+    <div className="border border-gray-600 rounded-lg max-w-[600px] ml-auto mr-20 h-full flex flex-col relative">
       {/* Chat messages container */}
       <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent pb-20">
         {messagesState.map((msg, index) => {

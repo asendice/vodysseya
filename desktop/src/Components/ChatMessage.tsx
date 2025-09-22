@@ -45,8 +45,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, previousTimestamp })
       <div
         className={
           isUser
-            ? 'bg-gray-700 rounded-lg text-white px-4 py-2 max-w-xs break-words'
-            : 'text-white px-4 py-2 max-w-xs break-words'
+            ? 'bg-gray-700 rounded-lg text-white px-4 py-2 max-w-xl break-words'
+            : 'text-white px-4 py-2 max-w-xl break-words'
         }
       >
         <div className="flex items-center mb-1">
