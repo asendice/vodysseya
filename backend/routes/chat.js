@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
         },
       ],
       temperature: 0.9,
-      max_tokens: 800,
+      max_tokens: 2000,
     };
 
     const response = await fetch('https://api.x.ai/v1/chat/completions', {

@@ -46,7 +46,7 @@ async function generateDialogue(inputs, apiKey, options = {}) {
       voiceSettings: options.voiceSettings || {
         stability: 0.75,
         similarityBoost: 0.75,
-        style: 0.5, // Flirty Ani vibe
+        style: 0.7, // Flirty Ani vibe
         useSpeakerBoost: true,
       },
       outputFormat: 'mp3_44100_128', // Compact for mobile/desktop
