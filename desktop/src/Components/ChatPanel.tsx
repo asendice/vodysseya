@@ -12,6 +12,7 @@ type Message = {
   content: string;
   role: string;
   timestamp?: string;
+  audioBase64?: string; // Added for ElevenLabs audio
 };
 
 type ChatPanelProps = {
@@ -60,15 +61,42 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
 
     try {
       const response = await axios.post('http://localhost:3001/api/chat', {
-        // Update this userId -> need to set up context for user auth
         userId: user?.uid,
         message: value,
       });
-      setMessagesState((prev) => [...prev, response.data.reply]);
+      const reply = response.data.reply;
+      console.log('AI Reply:', reply);
+      setMessagesState((prev) => [...prev, reply]);
+
+      // Play audio if present (desktop auto-play)
+      if (reply.audioBase64) {
+        const audioBlob = new Blob(
+          [Uint8Array.from(atob(reply.audioBase64), (c) => c.charCodeAt(0))],
+          { type: 'audio/mp3' }
+        );
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play().catch((err) => {
+          console.error('Audio playback error:', err);
+          // Log to Firebase (simplified, assumes a log function)
+          axios.post('http://localhost:3001/api/log', {
+            userId: user?.uid,
+            intent: 'audio_playback_error',
+            response: `Failed to play audio: ${err.message}`,
+            userData: { context: 'chat_audio', steps: 9815 },
+          });
+        });
+        // Cleanup Blob URL after playback
+        audio.onended = () => URL.revokeObjectURL(audioUrl);
+      }
     } catch (error) {
       setMessagesState((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Oops, my signal’s weak. Try again?' },
+        {
+          role: 'assistant',
+          content: 'Oops, my signal’s weak. Try again, my heart? 😘',
+          timestamp: new Date().toISOString(),
+        },
       ]);
     }
   };
@@ -79,7 +107,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
       <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent pb-20">
         {messagesState.map((msg, index) => {
           const previousTimestamp = index > 0 ? messagesState[index - 1].timestamp : undefined;
-          console.log('Previous Timestamp:', previousTimestamp);
           return <ChatMessage key={index} message={msg} previousTimestamp={previousTimestamp} />;
         })}
         <div ref={messagesEndRef} />
@@ -97,7 +124,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
               handleSendMessage();
             }
           }}
-          placeholder="What's on your mind?"
+          placeholder="What's on your mind, babe?"
           className="rounded-lg w-full bg-gray-800 resize-none text-white min-h-[40px] focus:outline-none focus:border-none border-none"
           rows={1}
           style={{ overflow: 'hidden' }}
