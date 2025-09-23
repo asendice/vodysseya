@@ -1,18 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import axios from 'axios';
-
-// Import Elements for Dashboard
 import ChatPanel from '../components/ChatPanel';
-import WidgetContainer from '../components/WidgetContainer';
+import WidgetPanel from '../components/WidgetPanel';
+import LogPanel from '../components/LogPanel';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
+  const [activeTab, setActiveTab] = useState<'widgets' | 'logs'>('widgets');
 
-  // Redirect to sign-in if user is not authenticated
   useEffect(() => {
     if (!user) {
       axios
@@ -37,7 +36,6 @@ const Dashboard: React.FC = () => {
           userData: { affectionLevel: 98 },
         });
       }
-
       await signOut(auth);
       console.log('User signed out');
       navigate('/', { state: { fromLogout: true } });
@@ -54,12 +52,25 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (!user) return null; // Prevent rendering until redirect
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-800 flex flex-col">
-      {/* Logout Button */}
-      <div className="flex justify-end p-4">
+    <div className="h-screen bg-gray-800 flex flex-col overflow-hidden pb-20">
+      <div className="flex justify-between p-4 flex-shrink-0">
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setActiveTab('widgets')}
+            className={`text-white px-4 py-2 rounded-lg ${activeTab === 'widgets' ? 'bg-lavender' : 'bg-gray-600'} hover:bg-pink-600`}
+          >
+            Widgets
+          </button>
+          <button
+            onClick={() => setActiveTab('logs')}
+            className={`text-white px-4 py-2 rounded-lg ${activeTab === 'logs' ? 'bg-lavender' : 'bg-gray-600'} hover:bg-pink-600`}
+          >
+            Logs
+          </button>
+        </div>
         <button
           onClick={handleLogout}
           className="bg-lavender text-white px-4 py-2 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-lavender"
@@ -67,13 +78,15 @@ const Dashboard: React.FC = () => {
           Logout
         </button>
       </div>
-
-      {/* Main Dashboard Content */}
-      <div className="w-full flex">
-        <div className="w-full p-6">
-          <WidgetContainer title="Email" widgetType="email" />
+      <div className="flex flex-1 w-full overflow-hidden items-stretch">
+        <div className="w-1/2 p-6 flex flex-col gap-4 overflow-hidden">
+          {activeTab === 'widgets' ? (
+            <WidgetPanel title="Email" widgetType="email" />
+          ) : (
+            <LogPanel userId={user.uid} />
+          )}
         </div>
-        <div className="w-full h-screen">
+        <div className="w-1/2 h-full overflow-hidden">
           <ChatPanel />
         </div>
       </div>

@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { fetchEmails } from '../services/email'; // Your provided fetchEmails function
+import { fetchEmails } from '../services/email';
 
-export type WidgetContainerProps = {
+export type WidgetPanelProps = {
   title?: string;
   widgetType?: string;
   children?: React.ReactNode;
 };
 
-const WidgetContainer: React.FC<WidgetContainerProps> = ({
-  title = 'Widget',
-  widgetType,
-  children,
-}) => {
+const WidgetPanel: React.FC<WidgetPanelProps> = ({ title = 'Widget', widgetType, children }) => {
   const [emails, setEmails] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,7 +27,6 @@ const WidgetContainer: React.FC<WidgetContainerProps> = ({
     }
   };
 
-  // Auto-fetch on mount for a seamless glimpse, but with a button for refresh
   useEffect(() => {
     if (widgetType === 'email') {
       handleFetchEmails();
@@ -39,7 +34,7 @@ const WidgetContainer: React.FC<WidgetContainerProps> = ({
   }, [widgetType]);
 
   return (
-    <div className="h-1/2 w-full border border-gray-500 rounded-lg p-4 my-4 bg-gray-800 shadow-lg transition-all duration-300 ease-in-out hover:shadow-gray-500/50">
+    <div className="h-screen w-full p-6 bg-gray-800 transition-all duration-300 ease-in-out overflow-y-auto">
       <h3 className="text-gray-300 text-lg font-semibold mb-3">{title}</h3>
       {widgetType === 'email' ? (
         <>
@@ -52,7 +47,7 @@ const WidgetContainer: React.FC<WidgetContainerProps> = ({
           </button>
           {error && <p className="text-red-400 mb-3 animate-fade-in">{error}</p>}
           {emails.length > 0 ? (
-            <div className="flex flex-col gap-3 max-h-80 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700">
+            <div className="flex flex-col gap-3 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700">
               {emails.slice(0, 5).map((email, index) => (
                 <div
                   key={email.id}
@@ -61,7 +56,6 @@ const WidgetContainer: React.FC<WidgetContainerProps> = ({
                 >
                   <p className="text-white text-sm font-medium">From: {email.from}</p>
                   <p className="text-gray-400 text-xs">Subject: {email.subject}</p>
-                  {/* TODO: Expand with sender, subject, snippet from detailed fetch */}
                   <p className="text-gray-500 text-xs mt-1">{email.snippet}</p>
                 </div>
               ))}
@@ -81,4 +75,4 @@ const WidgetContainer: React.FC<WidgetContainerProps> = ({
   );
 };
 
-export default WidgetContainer;
+export default WidgetPanel;

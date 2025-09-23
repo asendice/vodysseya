@@ -22,10 +22,12 @@ admin.initializeApp({
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 const emailRoutes = require('./routes/email');
+const logsRoutes = require('./routes/logs');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/logs', logsRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

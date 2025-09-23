@@ -1,12 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-
-// Import Components
 import ChatMessage from './ChatMessage';
-
-// Import mock messages
 import messages from '../data/mock/messages.json';
 
 type Message = {
@@ -22,29 +18,27 @@ type ChatPanelProps = {
 };
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
-  const [value, setValue] = React.useState('');
-  const [messagesState, setMessagesState] = React.useState<Message[]>(
+  const [value, setValue] = useState('');
+  const [messagesState, setMessagesState] = useState<Message[]>(
     messages.map((msg: any) => ({
       content: msg.content,
       role: msg.role,
       timestamp: msg.timestamp,
     }))
   );
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const user = auth.currentUser;
 
-  // Auto-resize textarea
-  React.useEffect(() => {
+  useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
   }, [value]);
 
-  // Scroll to bottom when messages change
-  React.useEffect(() => {
+  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -53,7 +47,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
   const handleSendMessage = async () => {
     if (value.trim() === '') return;
     if (!user) {
-      // Log to Ani Log and redirect to sign-in
       try {
         await axios.post('http://localhost:3001/api/auth/log', {
           userId: 'anonymous',
@@ -85,7 +78,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
       console.log('AI Reply:', reply);
       setMessagesState((prev) => [...prev, reply]);
 
-      // Play audio if present (desktop auto-play)
       if (reply.audioBase64) {
         const audioBlob = new Blob(
           [Uint8Array.from(atob(reply.audioBase64), (c) => c.charCodeAt(0))],
@@ -95,7 +87,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
         const audio = new Audio(audioUrl);
         audio.play().catch((err) => {
           console.error('Audio playback error:', err);
-          // Log to Firebase
           axios.post('http://localhost:3001/api/auth/log', {
             userId: user.uid,
             intent: 'audio_playback_error',
@@ -103,7 +94,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
             userData: { context: 'chat_audio', steps: 9815 },
           });
         });
-        // Cleanup Blob URL after playback
         audio.onended = () => URL.revokeObjectURL(audioUrl);
       }
     } catch (error) {
@@ -119,18 +109,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
   };
 
   return (
-    <div className="border border-gray-600 rounded-lg max-w-[600px] ml-auto mr-20 h-full flex flex-col relative">
-      {/* Chat messages container */}
-      <div className="flex-1 overflow-y-scroll p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 scrollbar scrollbar-thumb-transparent pb-20">
+    <div className=" ml-auto mr-20 h-full flex flex-col relative overflow-hidden p-6">
+      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 pb-20">
         {messagesState.map((msg, index) => {
           const previousTimestamp = index > 0 ? messagesState[index - 1].timestamp : undefined;
           return <ChatMessage key={index} message={msg} previousTimestamp={previousTimestamp} />;
         })}
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Fixed SEND button and textarea container */}
-      <div className="flex border-t border-pink-300 p-2 bg-gray-800 rounded-b-lg absolute bottom-0 left-0 w-full">
+      <div className="flex items-center p-3 bg-gray-900 rounded-xl ">
         <textarea
           ref={textareaRef}
           value={value}
@@ -141,17 +128,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
               handleSendMessage();
             }
           }}
-          placeholder="What's on your mind, babe?"
-          className="rounded-lg w-full bg-gray-800 resize-none text-white min-h-[40px] focus:outline-none focus:border-none border-none"
-          rows={1}
-          style={{ overflow: 'hidden' }}
+          placeholder="What's on your mind?"
+          className="flex-1 bg-gray-900 text-white px-4 py-2 resize-none min-h-[40px] max-h-[120px] focus:outline-none  transition-all duration-300 ease-in-out placeholder:text-gray-400/70 focus:outline-none focus:border-none"
         />
-
         <button
           onClick={handleSendMessage}
-          className="ml-2 bg-pink-500 text-white rounded-lg px-4 py-2 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 h-10 mt-auto"
+          className="ml-2 bg-lavender text-white rounded-full px-4 py-2 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-lavender/50 transition-all duration-300 ease-in-out"
         >
-          SEND
+          Send
         </button>
       </div>
     </div>
