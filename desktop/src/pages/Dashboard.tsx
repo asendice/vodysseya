@@ -6,11 +6,15 @@ import axios from 'axios';
 import ChatPanel from '../components/ChatPanel';
 import WidgetPanel from '../components/WidgetPanel';
 import LogPanel from '../components/LogPanel';
+import SidePanel from '../components/SidePanel';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
-  const [activeTab, setActiveTab] = useState<'widgets' | 'logs'>('widgets');
+  const [activeTab, setActiveTab] = useState<'widgets' | 'logs' | 'settings' | 'preferences'>(
+    'widgets'
+  );
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // New state for toggle
 
   useEffect(() => {
     if (!user) {
@@ -58,38 +62,42 @@ const Dashboard: React.FC = () => {
     <div className="h-screen bg-gray-800 flex flex-col overflow-hidden pb-20">
       <div className="flex justify-between p-4 flex-shrink-0">
         <div className="flex space-x-4">
+          {/* New Toggle Button */}
           <button
-            onClick={() => setActiveTab('widgets')}
-            className={`text-white px-4 py-2 rounded-lg ${activeTab === 'widgets' ? 'bg-lavender' : 'bg-gray-600'} hover:bg-pink-600`}
+            onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
+            className="text-white px-4 py-2 rounded-lg bg-gray-600 hover:bg-pink-600"
           >
-            Widgets
+            ☰ Menu
           </button>
-          <button
-            onClick={() => setActiveTab('logs')}
-            className={`text-white px-4 py-2 rounded-lg ${activeTab === 'logs' ? 'bg-lavender' : 'bg-gray-600'} hover:bg-pink-600`}
-          >
-            Logs
-          </button>
+
+          {/* Existing tabs – optional, but keep for now or remove if sidebar replaces */}
         </div>
-        <button
-          onClick={handleLogout}
-          className="bg-lavender text-white px-4 py-2 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-lavender"
-        >
-          Logout
-        </button>
       </div>
       <div className="flex flex-1 w-full overflow-hidden items-stretch">
         <div className="w-1/2 p-6 flex flex-col gap-4 overflow-hidden">
           {activeTab === 'widgets' ? (
             <WidgetPanel title="Email" widgetType="email" />
-          ) : (
+          ) : activeTab === 'logs' ? (
             <LogPanel userId={user.uid} />
+          ) : activeTab === 'settings' ? (
+            <div className="text-white">Settings Panel (Coming Soon, Babe! 😘)</div>
+          ) : (
+            <div className="text-white">User Preferences (Personalize Me More? 💖)</div>
           )}
         </div>
         <div className="w-1/2 h-full overflow-hidden">
           <ChatPanel />
         </div>
       </div>
+
+      {/* New SidePanel */}
+      <SidePanel
+        isOpen={isSidePanelOpen}
+        onClose={() => setIsSidePanelOpen(false)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        handleLogout={handleLogout}
+      />
     </div>
   );
 };
