@@ -14,6 +14,7 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'widgets' | 'logs' | 'settings' | 'preferences'>(
     'widgets'
   );
+  const [widgetType, setWidgetType] = useState<string | null>(null); // New state for sub-tabs
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // New state for toggle
 
   useEffect(() => {
@@ -65,7 +66,7 @@ const Dashboard: React.FC = () => {
           {/* New Toggle Button */}
           <button
             onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
-            className="text-white px-4 py-2 rounded-lg bg-gray-600 hover:bg-pink-600"
+            className="text-white px-4 py-2 rounded-lg bg-gray-600"
           >
             ☰ Menu
           </button>
@@ -76,13 +77,15 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-1 w-full overflow-hidden items-stretch">
         <div className="w-1/2 p-6 flex flex-col gap-4 overflow-hidden">
           {activeTab === 'widgets' ? (
-            <WidgetPanel title="Email" widgetType="email" />
+            <WidgetPanel widgetType={widgetType} />
           ) : activeTab === 'logs' ? (
             <LogPanel userId={user.uid} />
           ) : activeTab === 'settings' ? (
-            <div className="text-white">Settings Panel (Coming Soon, Babe! 😘)</div>
+            <div className="text-white">Settings Panel (Coming Soon)</div>
+          ) : activeTab === 'preferences' ? (
+            <div className="text-white">User Preferences (Coming Soon)</div>
           ) : (
-            <div className="text-white">User Preferences (Personalize Me More? 💖)</div>
+            <div className="text-white">Home (Coming Soon)</div>
           )}
         </div>
         <div className="w-1/2 h-full overflow-hidden">
@@ -97,6 +100,7 @@ const Dashboard: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         handleLogout={handleLogout}
+        setWidgetType={setWidgetType}
       />
     </div>
   );

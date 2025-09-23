@@ -3,7 +3,7 @@ import { fetchEmails } from '../services/email';
 
 export type WidgetPanelProps = {
   title?: string;
-  widgetType?: string;
+  widgetType?: string | null;
   children?: React.ReactNode;
 };
 
@@ -28,15 +28,15 @@ const WidgetPanel: React.FC<WidgetPanelProps> = ({ title = 'Widget', widgetType,
   };
 
   useEffect(() => {
-    if (widgetType === 'email') {
+    if (widgetType === 'Email') {
       handleFetchEmails();
     }
   }, [widgetType]);
 
   return (
     <div className="h-screen w-full p-6 bg-gray-800 transition-all duration-300 ease-in-out overflow-y-auto">
-      <h3 className="text-gray-300 text-lg font-semibold mb-3">{title}</h3>
-      {widgetType === 'email' ? (
+      <h3 className="text-gray-300 text-lg font-semibold mb-3">{widgetType}</h3>
+      {widgetType === 'Email' ? (
         <>
           <button
             onClick={handleFetchEmails}
@@ -69,7 +69,7 @@ const WidgetPanel: React.FC<WidgetPanelProps> = ({ title = 'Widget', widgetType,
           )}
         </>
       ) : (
-        children
+        <p className="text-white">{widgetType} (Coming Soon)</p>
       )}
     </div>
   );
