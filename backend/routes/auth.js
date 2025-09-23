@@ -41,7 +41,7 @@ router.post('/google', async (req, res) => {
           gmail_token: encryptedToken,
           displayName: displayName || '',
           preferences: {
-            voiceId: 'uYXf8XasLslADfZ2MB4u', // Default: Rachel
+            voiceId: 'tnSpp4vdxKPjI9w0GnoV', // Default: Rachel
             ttsModel: 'eleven_v3',
             stability: 0.75,
             similarityBoost: 0.75,

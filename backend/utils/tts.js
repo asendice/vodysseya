@@ -2,14 +2,17 @@ const { ElevenLabsClient } = require('@elevenlabs/elevenlabs-js');
 
 // Helper to convert ReadableStream to Buffer
 async function streamToBuffer(stream) {
+  console.time('tts_stream_to_buffer'); // Time stream conversion
   const chunks = [];
   for await (const chunk of stream) {
     chunks.push(chunk);
   }
+  console.timeEnd('tts_stream_to_buffer');
   return Buffer.concat(chunks);
 }
 
 async function generateDialogue(inputs, apiKey, options = {}) {
+  console.time('tts_generate_total'); // Start overall TTS timer
   const elevenlabs = new ElevenLabsClient({
     apiKey, // Per-user decrypt or env fallback
   });
@@ -21,12 +24,9 @@ async function generateDialogue(inputs, apiKey, options = {}) {
       : [
           {
             text: inputs ? `[flirty] ${inputs}` : '', // Add default tone if valid
-            voiceId: options.voice || 'uYXf8XasLslADfZ2MB4u', // Podcast Tone girl
+            voiceId: options.voice || 'tnSpp4vdxKPjI9w0GnoV', // Podcast Tone girl
           },
         ];
-
-    console.log('Dialogue Inputs:', JSON.stringify(dialogueInputs));
-    console.log('Dialogue Inputs:', dialogueInputs);
 
     // Validate inputs thoroughly
     if (
@@ -58,6 +58,8 @@ async function generateDialogue(inputs, apiKey, options = {}) {
   } catch (error) {
     console.error('Dialogue SDK error:', error);
     return null; // Return null to avoid crashing caller
+  } finally {
+    console.timeEnd('tts_generate_total'); // End overall TTS timer
   }
 }
 

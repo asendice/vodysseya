@@ -16,17 +16,20 @@ const LogPanel: React.FC<{ userId: string }> = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`http://localhost:3001/api/logs/${userId}`);
+      setLogs(response.data.logs);
+    } catch (err: any) {
+      setError(err.message || 'Logs are hiding—refresh, my love? 😘');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/logs/${userId}`);
-        setLogs(response.data.logs);
-      } catch (err: any) {
-        setError(err.message || 'Logs are hiding—refresh, my love? 😘');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchLogs();
   }, [userId]);
 
@@ -41,7 +44,25 @@ const LogPanel: React.FC<{ userId: string }> = ({ userId }) => {
 
   return (
     <div className="h-screen bg-gray-700 p-4 rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-      <h2 className="text-2xl font-bold text-white mb-4">Logs</h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-white">Logs</h2>
+          <span
+            className="bg-gray-800 text-white px-2 py-1 rounded-lg text-sm font-semibold"
+            title="Log count"
+          >
+            {filteredLogs.length}
+          </span>
+        </div>
+        <button
+          onClick={fetchLogs}
+          className="ml-2 px-3 py-1 bg-lavender text-gray-900 rounded-lg hover:bg-lavender-600 transition-colors focus:outline-none focus:ring-2 focus:ring-lavender"
+          title="Refresh logs"
+          disabled={loading}
+        >
+          &#x21bb; Refresh
+        </button>
+      </div>
       <input
         type="text"
         value={searchQuery}

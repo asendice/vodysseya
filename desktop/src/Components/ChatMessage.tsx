@@ -41,12 +41,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, previousTimestamp })
   }
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-2`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} my-12`}>
       <div
         className={
           isUser
-            ? 'bg-gray-700 rounded-lg text-white px-4 py-2 max-w-xl break-words'
-            : 'text-white px-4 py-2 max-w-xl break-words'
+            ? 'bg-gray-700 rounded-lg rounded-br-none text-white px-4 py-2  break-words'
+            : 'text-white px-4 py-2  break-words'
         }
       >
         <div className="flex items-center mb-1">
