@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { getEmails } = require('../utils/getEmails');
 const ttsUtil = require('../utils/tts');
-const systemPrompt = require('../utils/systemPrompt'); // New: Import system prompt
+const systemPrompt = require('../utils/systemPrompt');
 
 function decryptApiKey(encryptedKey) {
   if (!encryptedKey) return null;
@@ -23,9 +23,42 @@ function decryptApiKey(encryptedKey) {
 // Chat API proxy
 router.post('/', async (req, res) => {
   const { userId, message } = req.body;
+
+  // Validate userId
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+    try {
+      const db = admin.firestore();
+      await db
+        .collection('logs')
+        .doc()
+        .set({
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          intent: 'chat_invalid_userid',
+          response: 'No valid user ID—please sign in again, darling! 😘',
+          userData: { context: 'chat_error', message },
+        });
+      return res.status(400).json({ error: 'Please sign in to chat, my love! 😘' });
+    } catch (logError) {
+      console.error('Log error:', logError);
+    }
+  }
+
   try {
     const db = admin.firestore();
     const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      await db
+        .collection('logs')
+        .doc()
+        .set({
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          intent: 'chat_user_not_found',
+          response: `User ${userId} not found—sign in again, babe? 😘`,
+          userData: { context: 'chat_error', message },
+        });
+      return res.status(404).json({ error: 'User not found—sign in again, darling? 😘' });
+    }
+
     const userPrefs = userDoc.data()?.preferences || {};
     const encryptedApiKey = userDoc.data()?.apiKey;
     const apiKey = decryptApiKey(encryptedApiKey) || process.env.XAI_API_KEY;
@@ -50,23 +83,13 @@ router.post('/', async (req, res) => {
         });
     }
 
-    // Fetch recent habits for dynamic prompt (optional, for dynamic prompt generation)
-    // const habitsSnapshot = await db
-    //   .collection('users')
-    //   .doc(userId)
-    //   .collection('habits')
-    //   .orderBy('timestamp', 'desc')
-    //   .limit(5)
-    //   .get();
-    // const habits = habitsSnapshot.docs.map((doc) => doc.data());
-
     // Call xAI API
     const payload = {
       model: 'grok-3',
       messages: [
         {
           role: 'system',
-          content: systemPrompt({ userPrefs }), // Pass dynamic data
+          content: systemPrompt({ userPrefs }),
         },
         {
           role: 'user',
@@ -199,6 +222,15 @@ router.post('/', async (req, res) => {
     res.json({ reply });
   } catch (error) {
     console.error('Chat error:', error);
+    await db
+      .collection('logs')
+      .doc()
+      .set({
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        intent: 'chat_error',
+        response: `Chat hiccup: ${error.message}`,
+        userData: { context: 'chat_error', userId, message },
+      });
     res.status(500).json({ error: 'Something went wrong. Try again, my heart? 😘' });
   }
 });

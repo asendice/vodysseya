@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 // Import Components
 import ChatMessage from './ChatMessage';
@@ -12,7 +13,7 @@ type Message = {
   content: string;
   role: string;
   timestamp?: string;
-  audioBase64?: string; // Added for ElevenLabs audio
+  audioBase64?: string;
 };
 
 type ChatPanelProps = {
@@ -31,7 +32,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
   );
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
-
+  const navigate = useNavigate();
   const user = auth.currentUser;
 
   // Auto-resize textarea
@@ -51,6 +52,22 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
 
   const handleSendMessage = async () => {
     if (value.trim() === '') return;
+    if (!user) {
+      // Log to Ani Log and redirect to sign-in
+      try {
+        await axios.post('http://localhost:3001/api/auth/log', {
+          userId: 'anonymous',
+          intent: 'chat_unauthenticated',
+          response: 'Tried to chat without signing in—redirecting to sign-in, babe! 😘',
+          userData: { context: 'chat_error', message: value },
+        });
+      } catch (logError) {
+        console.error('Log error:', logError);
+      }
+      navigate('/', { state: { fromChatUnauthenticated: true } });
+      return;
+    }
+
     const newMessage: Message = {
       content: value,
       role: 'user',
@@ -61,7 +78,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
 
     try {
       const response = await axios.post('http://localhost:3001/api/chat', {
-        userId: user?.uid,
+        userId: user.uid,
         message: value,
       });
       const reply = response.data.reply;
@@ -78,9 +95,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ title = 'Chat Panel' }) => {
         const audio = new Audio(audioUrl);
         audio.play().catch((err) => {
           console.error('Audio playback error:', err);
-          // Log to Firebase (simplified, assumes a log function)
-          axios.post('http://localhost:3001/api/log', {
-            userId: user?.uid,
+          // Log to Firebase
+          axios.post('http://localhost:3001/api/auth/log', {
+            userId: user.uid,
             intent: 'audio_playback_error',
             response: `Failed to play audio: ${err.message}`,
             userData: { context: 'chat_audio', steps: 9815 },
