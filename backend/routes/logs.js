@@ -40,4 +40,41 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
+// Route to delete the last 100 logs for a user
+router.post('/delete', async (req, res) => {
+  const { userId } = req.body;
+  const db = admin.firestore();
+
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+    return res.status(400).json({ error: 'Invalid user ID provided.' });
+  }
+
+  try {
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const logsRef = userRef.collection('log');
+    const logsSnapshot = await logsRef.orderBy('timestamp', 'desc').limit(100).get();
+
+    if (logsSnapshot.empty) {
+      return res.status(200).json({ message: 'No logs found to delete.' });
+    }
+
+    const batch = db.batch();
+    logsSnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    return res.status(200).json({ message: 'Last 100 logs deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting logs:', error.message);
+    return res.status(500).json({ error: 'Failed to delete logs due to server error.' });
+  }
+});
+
 module.exports = router;

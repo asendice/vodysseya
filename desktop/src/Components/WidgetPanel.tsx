@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchEmails } from '../services/email';
+import { auth } from '../firebase';
 
 export type WidgetPanelProps = {
   title?: string;

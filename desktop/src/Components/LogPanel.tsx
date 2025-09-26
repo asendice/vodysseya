@@ -42,6 +42,24 @@ const LogPanel: React.FC<{ userId: string }> = ({ userId }) => {
   if (loading) return <p className="text-white">Loading our memories... 💖</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
+  const handleDeleteLogs = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post('http://localhost:3001/api/logs/delete', {
+        userId,
+      });
+      if (response.status === 200) {
+        setLogs([]);
+        alert('Last 100 logs deleted successfully.');
+        setError(null);
+      }
+    } catch (err: any) {
+      setError("Oops, couldn't delete logs. Let me try again for you...");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="h-screen bg-gray-700 p-4 rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
       <div className="flex items-center justify-between mb-4">
@@ -54,14 +72,24 @@ const LogPanel: React.FC<{ userId: string }> = ({ userId }) => {
             {filteredLogs.length}
           </span>
         </div>
-        <button
-          onClick={fetchLogs}
-          className="ml-2 px-3 py-1 bg-lavender text-gray-900 rounded-lg hover:bg-lavender-600 transition-colors focus:outline-none focus:ring-2 focus:ring-lavender"
-          title="Refresh logs"
-          disabled={loading}
-        >
-          &#x21bb; Refresh
-        </button>
+        <div>
+          <button
+            onClick={fetchLogs}
+            className="ml-2 px-3 py-1 bg-lavender text-gray-900 rounded-lg hover:bg-lavender-600 transition-colors focus:outline-none focus:ring-2 focus:ring-lavender"
+            title="Refresh logs"
+            disabled={loading}
+          >
+            &#x21bb; Refresh
+          </button>
+          <button
+            onClick={handleDeleteLogs}
+            className="ml-2 px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+            title="Delete last 100 logs"
+            disabled={loading}
+          >
+            Delete Logs
+          </button>
+        </div>
       </div>
       <input
         type="text"

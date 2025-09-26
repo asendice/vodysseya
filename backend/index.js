@@ -2,11 +2,28 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 require('dotenv').config();
+const bodyParser = require('body-parser');
 
 const app = express();
 
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' })); // Allow React frontend (Electron-compatible)
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+); // Allow React frontend (Electron-compatible)
+app.use(bodyParser.json({ limit: '20mb' })); // Increase to 20mb or higher as needed
+
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Transfer-Encoding', 'chunked');
+  res.setHeader('Content-Length', 1024 * 1024); // 1MB buffer
+  next();
+});
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({

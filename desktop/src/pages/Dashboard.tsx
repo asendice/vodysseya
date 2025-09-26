@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
   const [activeTab, setActiveTab] = useState<'widgets' | 'logs' | 'settings' | 'preferences'>(
-    'widgets'
+    'logs'
   );
   const [widgetType, setWidgetType] = useState<string | null>(null); // New state for sub-tabs
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // New state for toggle
